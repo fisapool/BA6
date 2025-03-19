@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=lazada_products
+    restart: unless-stopped
+    volumes:
+      - .:/app                # Maps current directory to /app in container
+      - /app/node_modules     # Preserves container's node_modules
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=lazada_products
+    # Port mapping removed to avoid conflicts
+    # If you need external access, you can use:
+    # ports:
+    #   - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db_schema.sql:/docker-entrypoint-initdb.d/db_schema.sql
+
+volumes:
+  db-data: 
